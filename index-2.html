@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Math War Plan ⚡</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080C14;
+    --surface: #0F1624;
+    --border: #1C2640;
+    --muted: #3D5070;
+    --text: #E2EAF8;
+    --subtext: #6B84A8;
+    --d1: #10B981;
+    --d2: #F59E0B;
+    --d3: #EF4444;
+    --sleep: #22D3EE;
+    --purple: #A855F7;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Space Grotesk', sans-serif; min-height: 100vh; }
+
+  header {
+    background: linear-gradient(160deg, #0D1A16 0%, #080C14 60%);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 24px 28px;
+    position: relative; overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, #10B98111 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner { max-width: 720px; margin: 0 auto; }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; line-height: 1.1; }
+  h1 span { color: var(--d1); }
+  .subtitle { color: var(--subtext); font-size: 14px; margin-top: 8px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .tag { background: #0F1624; border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--subtext); font-family: 'JetBrains Mono', monospace; }
+
+  .sleep-banner { max-width: 720px; margin: 20px auto 0; padding: 0 24px; }
+  .sleep-card {
+    background: linear-gradient(135deg, #0A1A2E, #091428);
+    border: 1px solid #22D3EE33;
+    border-left: 3px solid var(--sleep);
+    border-radius: 10px; padding: 12px 16px;
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  }
+  .sleep-stat { text-align: center; }
+  .sleep-stat .num { font-size: 22px; font-weight: 800; color: var(--sleep); font-family: 'JetBrains Mono', monospace; }
+  .sleep-stat .lbl { font-size: 10px; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; }
+  .sleep-divider { width: 1px; height: 36px; background: var(--border); }
+  .sleep-note { font-size: 12px; color: var(--subtext); flex: 1; min-width: 180px; }
+  .sleep-note strong { color: var(--sleep); }
+
+  /* chapter priority bar */
+  .priority-bar { max-width: 720px; margin: 16px auto 0; padding: 0 24px; }
+  .priority-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+  .priority-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .priority-items { display: flex; flex-direction: column; gap: 6px; }
+  .priority-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .priority-rank { font-family: 'JetBrains Mono', monospace; font-weight: 700; min-width: 20px; }
+  .priority-bar-fill { height: 6px; border-radius: 3px; }
+  .priority-label { color: var(--subtext); }
+
+  .main { max-width: 720px; margin: 0 auto; padding: 24px 24px 60px; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .tab-btn {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 10px; cursor: pointer; text-align: center;
+    transition: all 0.2s; color: var(--subtext); font-family: inherit;
+  }
+  .tab-btn .tab-label { font-size: 13px; font-weight: 700; display: block; }
+  .tab-btn .tab-sub { font-size: 10px; margin-top: 3px; display: block; font-family: 'JetBrains Mono', monospace; }
+  .tab-btn.active-d1 { background: #0D2A1E; border-color: var(--d1); color: #fff; box-shadow: 0 4px 20px #10B98122; }
+  .tab-btn.active-d2 { background: #2A1E0D; border-color: var(--d2); color: #fff; box-shadow: 0 4px 20px #F59E0B22; }
+  .tab-btn.active-d3 { background: #3a1a1a; border-color: var(--d3); color: #fff; box-shadow: 0 4px 20px #EF444422; }
+
+  .day-header { border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+  .day-header .dh-eye { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; opacity: 0.7; margin-bottom: 5px; text-transform: uppercase; }
+  .day-header .dh-title { font-size: 19px; font-weight: 800; }
+  .day-header .dh-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+
+  .info-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--subtext); line-height: 1.5; }
+  .info-bar strong { color: #CBD5E1; }
+
+  .block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 7px; overflow: hidden; cursor: pointer; transition: border-color 0.15s; }
+  .block:hover { border-color: var(--muted); }
+  .block-header { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
+  .block-left-bar { width: 3px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+  .block-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); min-width: 105px; flex-shrink: 0; }
+  .block-pill { border-radius: 6px; padding: 3px 9px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .block-arrow { margin-left: auto; color: var(--muted); font-size: 11px; transition: transform 0.2s; }
+  .block-arrow.open { transform: rotate(180deg); }
+  .block-desc { padding: 10px 14px 13px 41px; font-size: 13px; color: var(--subtext); line-height: 1.65; border-top: 1px solid var(--border); }
+
+  .t-kickoff .block-left-bar { background: #FBBF24; }
+  .t-kickoff .block-pill { background: #2C2000; color: #FBBF24; }
+  .t-itrig .block-left-bar { background: #EF4444; }
+  .t-itrig .block-pill { background: #2A0A0A; color: #FCA5A5; }
+  .t-lp .block-left-bar { background: #F59E0B; }
+  .t-lp .block-pill { background: #231500; color: #FCD34D; }
+  .t-matrix .block-left-bar { background: #A855F7; }
+  .t-matrix .block-pill { background: #1E0D40; color: #C4B5FD; }
+  .t-det .block-left-bar { background: #3B82F6; }
+  .t-det .block-pill { background: #0D1E40; color: #93C5FD; }
+  .t-rf .block-left-bar { background: #10B981; }
+  .t-rf .block-pill { background: #0A2A1A; color: #6EE7B7; }
+  .t-review .block-left-bar { background: #10B981; }
+  .t-review .block-pill { background: #0A2A1A; color: #6EE7B7; }
+  .t-problems .block-left-bar { background: #F97316; }
+  .t-problems .block-pill { background: #2A1000; color: #FDBA74; }
+  .t-mock .block-left-bar { background: #EC4899; }
+  .t-mock .block-pill { background: #2A0A1A; color: #F9A8D4; }
+  .t-break .block-left-bar { background: var(--muted); }
+  .t-break .block-pill { background: #141C2A; color: var(--subtext); }
+  .t-meal .block-left-bar { background: #F59E0B; }
+  .t-meal .block-pill { background: #231500; color: #FCD34D; }
+  .t-sleep .block-left-bar { background: var(--sleep); }
+  .t-sleep .block-pill { background: #001E26; color: var(--sleep); }
+  .t-nap .block-left-bar { background: #818CF8; }
+  .t-nap .block-pill { background: #0D0F2A; color: #A5B4FC; }
+  .t-stop .block-left-bar { background: var(--d3); }
+  .t-stop .block-pill { background: #2A0000; color: #F87171; }
+
+  .legend { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-top: 20px; }
+  .legend-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .legend-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .legend-pill { border-radius: 6px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
+
+  .caf-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+  .caf-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .caf-row { display: flex; gap: 10px; font-size: 12px; color: var(--subtext); align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .caf-row:last-child { border-bottom: none; }
+  .caf-day { color: #CBD5E1; font-weight: 600; min-width: 50px; }
+  .caf-cut { color: var(--d3); margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+  .exam-card {
+    margin-top: 12px;
+    background: linear-gradient(135deg, #052E20, #063B28);
+    border: 1px solid #059669;
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .exam-title { font-size: 14px; font-weight: 700; color: #6EE7B7; margin-bottom: 10px; }
+  .exam-items { display: flex; flex-direction: column; gap: 7px; }
+  .exam-item { font-size: 13px; color: #A7F3D0; line-height: 1.5; }
+
+  .day-panel { display: none; }
+  .day-panel.active { display: block; }
+
+  @media (max-width: 480px) {
+    header { padding: 28px 16px 20px; }
+    .main { padding: 16px 16px 60px; }
+    .sleep-banner, .priority-bar { padding: 0 16px; }
+    .block-time { min-width: 80px; font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="eyebrow">Mathematics Exam Prep · Exam: Day 4 Morning</div>
+    <h1>Math <span>War Plan</span> ⚡</h1>
+    <p class="subtitle">5 Chapters · 3 Days · Inverse Trig & LP get priority</p>
+    <div class="tags">
+      <span class="tag">Inverse Trig 🔴</span>
+      <span class="tag">Linear Programming 🟡</span>
+      <span class="tag">Matrices</span>
+      <span class="tag">Determinants</span>
+      <span class="tag">Relations & Functions</span>
+    </div>
+  </div>
+</header>
+
+<div class="sleep-banner">
+  <div class="sleep-card" style="margin-top:20px;">
+    <div class="sleep-stat">
+      <div class="num">4.5h</div>
+      <div class="lbl">Day 1 sleep</div>
+    </div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-stat">
+      <div class="num">4.5h</div>
+      <div class="lbl">Day 2 sleep</div>
+    </div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-stat">
+      <div class="num">6h</div>
+      <div class="lbl">Day 3 sleep</div>
+    </div>
+    <div class="sleep-divider"></div>
+    <div class="sleep-note"><strong>15 hrs total</strong> — math needs working memory. Sleep keeps it sharp.</div>
+  </div>
+</div>
+
+<div class="priority-bar">
+  <div class="priority-card" style="margin-top:16px;">
+    <div class="priority-title">Chapter Priority</div>
+    <div class="priority-items">
+      <div class="priority-row">
+        <span class="priority-rank" style="color:#EF4444;">1</span>
+        <div class="priority-bar-fill" style="width:90%;background:#EF4444;"></div>
+        <span class="priority-label">Inverse Trig — scariest, most time</span>
+      </div>
+      <div class="priority-row">
+        <span class="priority-rank" style="color:#F59E0B;">2</span>
+        <div class="priority-bar-fill" style="width:75%;background:#F59E0B;"></div>
+        <span class="priority-label">Linear Programming — fully unfamiliar</span>
+      </div>
+      <div class="priority-row">
+        <span class="priority-rank" style="color:#A855F7;">3</span>
+        <div class="priority-bar-fill" style="width:55%;background:#A855F7;"></div>
+        <span class="priority-label">Matrices — you've done these before</span>
+      </div>
+      <div class="priority-row">
+        <span class="priority-rank" style="color:#3B82F6;">4</span>
+        <div class="priority-bar-fill" style="width:45%;background:#3B82F6;"></div>
+        <span class="priority-label">Determinants — linked to matrices</span>
+      </div>
+      <div class="priority-row">
+        <span class="priority-rank" style="color:#10B981;">5</span>
+        <div class="priority-bar-fill" style="width:30%;background:#10B981;"></div>
+        <span class="priority-label">Relations & Functions — most familiar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="tabs" style="margin-top:24px;">
+    <button class="tab-btn active-d1" onclick="switchDay(0)">
+      <span class="tab-label">DAY 1</span>
+      <span class="tab-sub">Inv Trig + LP</span>
+    </button>
+    <button class="tab-btn" onclick="switchDay(1)">
+      <span class="tab-label">DAY 2</span>
+      <span class="tab-sub">Matrices + Det + R&F</span>
+    </button>
+    <button class="tab-btn" onclick="switchDay(2)">
+      <span class="tab-label">DAY 3</span>
+      <span class="tab-sub">Mocks + Seal</span>
+    </button>
+  </div>
+
+  <!-- DAY 1 -->
+  <div class="day-panel active" id="panel-0">
+    <div class="day-header" style="background:linear-gradient(135deg,#1A0D0D,#0f1e16); border:1px solid #EF444444;">
+      <div class="dh-eye">DAY 1</div>
+      <div class="dh-title">Inverse Trig + Linear Programming</div>
+      <div class="dh-sub">Your two weakest chapters. Hit them while your brain is freshest.</div>
+    </div>
+    <div class="info-bar">📋 <strong>Focus:</strong> Inverse Trig gets the morning (hardest, needs most time) · LP gets the afternoon & evening · Sleep 3:00–7:30 AM</div>
+    <div id="blocks-0"></div>
+  </div>
+
+  <!-- DAY 2 -->
+  <div class="day-panel" id="panel-1">
+    <div class="day-header" style="background:linear-gradient(135deg,#1E0D2A,#0D1E1A); border:1px solid #A855F744;">
+      <div class="dh-eye">DAY 2</div>
+      <div class="dh-title">Matrices + Determinants + Relations & Functions</div>
+      <div class="dh-sub">Chapters you have some base in. Go fast on R&F, deep on Matrices & Det.</div>
+    </div>
+    <div class="info-bar">📋 <strong>Focus:</strong> Matrices & Determinants get bulk of time · R&F is revision only · Practice problems across all 5 chapters overnight · Sleep 3:00–7:30 AM</div>
+    <div id="blocks-1"></div>
+  </div>
+
+  <!-- DAY 3 -->
+  <div class="day-panel" id="panel-2">
+    <div class="day-header" style="background:linear-gradient(135deg,#3a1a1a,#2a0f0f); border:1px solid #EF444444;">
+      <div class="dh-eye">DAY 3</div>
+      <div class="dh-title">Full Mock Exams + Gap Repair</div>
+      <div class="dh-sub">Simulate the real paper twice. Seal every remaining gap.</div>
+    </div>
+    <div class="info-bar">📋 <strong>Mode:</strong> 2 full mocks across all 5 chapters · Gap repair after each · Final formula/identity review · STOP at 11 PM · 6 hrs sleep</div>
+    <div id="blocks-2"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-title">Legend</div>
+    <div class="legend-items">
+      <span class="legend-pill" style="background:#2A0A0A;color:#FCA5A5;">Inverse Trig</span>
+      <span class="legend-pill" style="background:#231500;color:#FCD34D;">Linear Programming</span>
+      <span class="legend-pill" style="background:#1E0D40;color:#C4B5FD;">Matrices</span>
+      <span class="legend-pill" style="background:#0D1E40;color:#93C5FD;">Determinants</span>
+      <span class="legend-pill" style="background:#0A2A1A;color:#6EE7B7;">Relations & Functions</span>
+      <span class="legend-pill" style="background:#2A1000;color:#FDBA74;">Practice Problems</span>
+      <span class="legend-pill" style="background:#2A0A1A;color:#F9A8D4;">Mock Exam</span>
+      <span class="legend-pill" style="background:#001E26;color:#22D3EE;">Sleep</span>
+    </div>
+  </div>
+
+  <div class="caf-card">
+    <div class="caf-title">☕ Caffeine Rules</div>
+    <div class="caf-row"><span class="caf-day">Day 1</span><span>3 cups</span><span class="caf-cut">Cut off 4:00 PM</span></div>
+    <div class="caf-row"><span class="caf-day">Day 2</span><span>3 cups</span><span class="caf-cut">Cut off 3:30 PM</span></div>
+    <div class="caf-row"><span class="caf-day">Day 3</span><span>3 cups</span><span class="caf-cut">Cut off 3:45 PM ← critical</span></div>
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-title">🎯 DAY 4 — EXAM MORNING</div>
+    <div class="exam-items">
+      <div class="exam-item">⏰ Wake 2 hrs before exam</div>
+      <div class="exam-item">📋 Skim inverse trig identities + LP method only — no new material</div>
+      <div class="exam-item">☕ Light breakfast + one coffee</div>
+      <div class="exam-item">🧘 Stop 30 min before — you've done the work</div>
+      <div class="exam-item">💪 Execute</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = [
+  // DAY 1 — Inverse Trig + Linear Programming
+  [
+    { time:"6:00–6:30 AM", type:"kickoff", label:"☕ Kickoff", desc:"Coffee. Write out all inverse trig identities you already know (or think you know). Then list every LP concept you've heard of. This shows you where you're starting from." },
+    { time:"6:30–9:00 AM", type:"itrig", label:"📐 Inverse Trig — Concepts", desc:"Cover domain & range of all 6 inverse trig functions. Principal value branch. Graphs. This is the foundation — don't skip it even if it feels basic." },
+    { time:"9:00–9:15 AM", type:"break", label:"Break", desc:"Snack + coffee #2." },
+    { time:"9:15–11:30 AM", type:"itrig", label:"📐 Inverse Trig — Identities", desc:"Work through every identity: complementary, supplementary, double angle, negative angle. Write each one. Derive where possible — don't just memorise." },
+    { time:"11:30 AM–1:00 PM", type:"itrig", label:"✏️ Inverse Trig — NCERT Solved Examples", desc:"Every solved example in the NCERT chapter. Do each one yourself first, then check. Flag any where you used the wrong identity." },
+    { time:"1:00–1:30 PM", type:"meal", label:"🍽 Meal", desc:"Eat. Real food. Brain needs glucose for the LP grind ahead." },
+    { time:"1:30–3:30 PM", type:"lp", label:"📊 LP — Concepts & Method", desc:"Linear Programming from scratch. Cover: feasible region, corner point method, objective function, bounded vs unbounded regions. Draw diagrams for every concept." },
+    { time:"3:30–3:45 PM", type:"break", label:"Break", desc:"Coffee #3 (last today). Snack." },
+    { time:"3:45–5:30 PM", type:"lp", label:"📊 LP — NCERT Solved Examples", desc:"Every solved LP problem in NCERT. Do them fully — graph, shade region, find corner points, evaluate objective function. LP is 100% method-based, repetition is everything." },
+    { time:"5:30–7:00 PM", type:"itrig", label:"✏️ Inverse Trig — Back Questions", desc:"NCERT back exercise questions on Inverse Trig. Timed — max 8 min per question." },
+    { time:"7:00–7:30 PM", type:"meal", label:"🍽 Meal", desc:"Eat. Hydrate." },
+    { time:"7:30–9:30 PM", type:"lp", label:"📊 LP — Back Questions", desc:"NCERT back exercise on LP. Every single question. Draw every graph properly." },
+    { time:"9:30–9:45 PM", type:"nap", label:"💤 Micro-nap", desc:"15 min. Set alarm." },
+    { time:"9:45 PM–12:00 AM", type:"itrig", label:"📐 Inverse Trig — Identity Drill", desc:"Write every identity from memory on a blank sheet. Check. Redo any you missed. Repeat until clean." },
+    { time:"12:00–2:00 AM", type:"lp", label:"📊 LP — Mixed Practice", desc:"Extra LP problems (SL Arora / past papers). Focus on corner point method speed. Every graph should take under 3 min to draw." },
+    { time:"2:00–3:00 AM", type:"review", label:"🔁 Day 1 Flash Review", desc:"Quick flip through all Inverse Trig identities and LP method steps. Wind down." },
+    { time:"3:00–7:30 AM", type:"sleep", label:"😴 SLEEP — 4.5 hrs", desc:"Set two alarms for 7:30 AM. Non-negotiable." },
+  ],
+  // DAY 2 — Matrices + Determinants + R&F
+  [
+    { time:"7:30–8:00 AM", type:"kickoff", label:"☕ Kickoff", desc:"Coffee. Quick identity recall — write 5 inverse trig identities and 1 LP problem from memory. Keep Day 1 warm." },
+    { time:"8:00–10:30 AM", type:"matrix", label:"🔢 Matrices — Full Coverage", desc:"Types of matrices, operations (add, subtract, multiply), transpose, symmetric/skew-symmetric. You've done matrix problems before — move efficiently. Focus on where you've made errors before." },
+    { time:"10:30–10:45 AM", type:"break", label:"Break", desc:"Coffee #2. Snack." },
+    { time:"10:45 AM–12:30 PM", type:"matrix", label:"✏️ Matrices — Solved + Back Questions", desc:"All NCERT solved examples, then back exercise. Inverse of a matrix, adjoint, elementary row operations. Redo any you get wrong immediately." },
+    { time:"12:30–1:00 PM", type:"meal", label:"🍽 Meal", desc:"Eat." },
+    { time:"1:00–3:00 PM", type:"det", label:"🔢 Determinants — Full Coverage", desc:"Properties of determinants, minors & cofactors, adjoint, inverse using determinants, area of triangle, Cramer's rule. Linked to matrices — the concepts flow together." },
+    { time:"3:00–3:15 PM", type:"break", label:"Break", desc:"Coffee #3 (last today). Snack." },
+    { time:"3:15–5:00 PM", type:"det", label:"✏️ Determinants — Solved + Back Questions", desc:"All NCERT solved examples and back exercise on Determinants. Pay attention to property-based shortcuts — they save massive time in exams." },
+    { time:"5:00–6:00 PM", type:"rf", label:"📎 Relations & Functions — Rapid Revision", desc:"You know this chapter. Fast pass: types of relations, types of functions, composition, invertibility, binary operations. Only go deep if you find a gap." },
+    { time:"6:00–6:30 PM", type:"meal", label:"🍽 Meal", desc:"Eat. Hydrate." },
+    { time:"6:30–8:30 PM", type:"problems", label:"✏️ Mixed Practice — All 5 Chapters", desc:"Mixed problem set across all 5 chapters. Simulate what an exam paper looks like. Don't just do easy ones." },
+    { time:"8:30–8:45 PM", type:"nap", label:"💤 Micro-nap", desc:"15 min. Set alarm." },
+    { time:"8:45 PM–11:00 PM", type:"problems", label:"✏️ SL Arora / Past Paper Problems", desc:"Extra problems — priority: Inverse Trig and LP first, then Matrices/Det. R&F only if time allows." },
+    { time:"11:00 PM–1:00 AM", type:"review", label:"🔁 Wrong Answers Review", desc:"Everything you got wrong today — identify pattern. Is it a concept gap, a formula error, or a careless mistake? Fix it." },
+    { time:"1:00–3:00 AM", type:"review", label:"📝 Master Sheet", desc:"Build a one-page master sheet: all inverse trig identities, LP steps, key matrix/det properties, R&F types. This is your Day 4 morning skim sheet." },
+    { time:"3:00–7:30 AM", type:"sleep", label:"😴 SLEEP — 4.5 hrs", desc:"Two alarms for 7:30 AM. Let it consolidate." },
+  ],
+  // DAY 3 — Mocks + Seal
+  [
+    { time:"7:30–8:00 AM", type:"kickoff", label:"☕ Kickoff", desc:"Coffee. Skim your master sheet. Do one LP problem and one inverse trig identity from memory to warm up." },
+    { time:"8:00–10:30 AM", type:"mock", label:"🎯 Mock Exam #1", desc:"Full paper — all 5 chapters, mixed. Timed. Exam conditions. No notes, no phone. Treat it like the real thing." },
+    { time:"10:30–11:00 AM", type:"review", label:"📊 Mark & Analyse", desc:"Grade it. Categorise every wrong answer: which chapter, which concept, what type of error." },
+    { time:"11:00–11:15 AM", type:"break", label:"Break", desc:"Coffee #2. Snack." },
+    { time:"11:15 AM–1:15 PM", type:"problems", label:"✏️ Gap Repair — Mock #1", desc:"Fix every gap. For LP and Inverse Trig especially — redo the exact problem type you got wrong until you can do it clean." },
+    { time:"1:15–1:45 PM", type:"meal", label:"🍽 Meal", desc:"Eat properly." },
+    { time:"1:45–4:15 PM", type:"mock", label:"🎯 Mock Exam #2", desc:"Different full paper. All 5 chapters. Timed. Push to finish 10 min early." },
+    { time:"4:15–4:45 PM", type:"review", label:"📊 Mark & Analyse", desc:"Grade Mock #2. Anything wrong in BOTH mocks = highest priority in gap repair." },
+    { time:"4:45–5:00 PM", type:"break", label:"Break", desc:"Coffee #3 — LAST CAFFEINE. Exam tomorrow morning." },
+    { time:"5:00–6:30 PM", type:"problems", label:"✏️ Gap Repair — Mock #2", desc:"Fix whatever Mock #2 exposed. Hard focus on double-fail topics." },
+    { time:"6:30–7:00 PM", type:"meal", label:"🍽 Meal", desc:"Eat." },
+    { time:"7:00–8:30 PM", type:"itrig", label:"📐 Inverse Trig — Final Identity Run", desc:"Write every identity one last time from memory. Clean. This is your seal." },
+    { time:"8:30–9:30 PM", type:"lp", label:"📊 LP — Final Method Run", desc:"Do 2–3 LP problems end to end from scratch. Fast and clean." },
+    { time:"9:30–10:30 PM", type:"review", label:"🔁 Master Sheet Skim", desc:"Read through your master sheet slowly. Visualise applying each formula/method." },
+    { time:"10:30–11:00 PM", type:"review", label:"📖 Chapter Summary Skim", desc:"Quick mental pass through all 5 chapters. Big picture only." },
+    { time:"11:00 PM", type:"stop", label:"🛑 STOP STUDYING", desc:"Pack your bag. Stationery ready. Set two alarms. You've done the work." },
+    { time:"11:00 PM–5:00 AM", type:"sleep", label:"😴 SLEEP — 6 hrs", desc:"Memory locks in now. Non-negotiable." },
+  ]
+];
+
+function renderBlocks(dayIdx) {
+  const container = document.getElementById(`blocks-${dayIdx}`);
+  container.innerHTML = '';
+  data[dayIdx].forEach((b, i) => {
+    const id = `b-${dayIdx}-${i}`;
+    const div = document.createElement('div');
+    div.className = `block t-${b.type}`;
+    div.innerHTML = `
+      <div class="block-header" onclick="toggleBlock('${id}')">
+        <div class="block-left-bar"></div>
+        <span class="block-time">${b.time}</span>
+        <span class="block-pill">${b.label}</span>
+        <span class="block-arrow" id="arrow-${id}">▼</span>
+      </div>
+      <div class="block-desc" id="${id}" style="display:none">${b.desc}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function toggleBlock(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(`arrow-${id}`);
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  arrow.classList.toggle('open', !open);
+}
+
+function switchDay(idx) {
+  document.querySelectorAll('.day-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.className = 'tab-btn';
+    if(i===idx) b.classList.add(['active-d1','active-d2','active-d3'][idx]);
+  });
+}
+
+[0,1,2].forEach(renderBlocks);
+</script>
+</body>
+</html>
